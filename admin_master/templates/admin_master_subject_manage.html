@@ -1,0 +1,184 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="page-title">                    
+    <h2><span class="fa fa-arrow-circle-o-left"></span> Subject Management</h2>
+</div> 
+{% if mesg != '' %}
+<button class="btn btn-success" onClick="noty({text: 'Successful action', layout: 'topRight', type: 'success'});">{{mesg}}</button>
+{% endif %}
+
+{% if msg != '' %}
+<button class="btn btn-danger" onClick="noty({text: 'There was an error', layout: 'topRight', type: 'error'});">{{msg}}</button> 
+{% endif %}
+
+<div class="row">
+    <div class="col-md-5">
+        <h4>Add Subjects</h4>
+
+<form id="myForm" method="post">{% csrf_token %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+        <input type="text" class="form-control" name="sname" placeholder="Subject name"/>
+        <div class="block">
+            <div class="form-group">
+                <div class="col-md-12">
+                    Class<label class="check"><input type="checkbox" id="toggleAll" onclick="leo()" class="icheck"/> </label>
+                </div>
+            </div>
+            <div id="checkboxes">
+                <!-- Your checkboxes in the for loop -->
+                {% for i in class %}
+                    {% if i.status == 1 %}
+                        <div>
+                            <label>
+                                <input type="checkbox"  class="icheck" id="check" name="checkitems" value="{{i.id}}"/> <!-- Assuming i.id represents the checkbox value -->
+                                {{i.name}}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <button type="submit" onclick="return validateForm()" class="btn btn-success pull-right">Submit</button>
+        </div>
+    </div>
+</form>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="block">
+            <h4>View Subjects</h4>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <table class="table datatable">
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>subject name</th>
+                                <th>status</th>
+                                <th>action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in subjects %}
+                            <tr id="tr{{i.id}}">
+                                <td>{{forloop.counter}}</td>
+                                <td>{{i.sname}}</td>
+                                <td>{% if i.sstatus == 1 %}<span class="label label-success">Active</span>{% else %}
+                                    <span class="label label-danger">Deactive</span>  {% endif %}</td>
+                                    <td><button class="btn btn-default btn-rounded btn-sm" onclick="edit_sub('{{i.id}}')"><span id="spinner{{i.id}}" class="fa fa-pencil"></span></button>
+                                        <button class="btn btn-default btn-rounded btn-sm" onClick=""><span class="fa fa-eye"></span></button>
+                                        <button class="btn btn-default btn-rounded btn-sm" onClick="delete_row('{{i.id}}','tr{{i.id}}')"><span class="fa fa-trash-o"></span></button>
+                                        <input type="hidden" value="{{request.scheme}}://{{request.get_host}}/del_sub/" id="delink">
+                                        <input type="hidden" value="{{request.scheme}}://{{request.get_host}}/edit_sub/" id="link">
+                                        <input type="hidden" id="deptid">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <!-- Add more table rows if needed -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="message-box animated fadeIn" data-sound="alert" id="mb-remove-row">
+    <div class="mb-container">
+        <div class="mb-middle">
+            <div class="mb-title"><span class="fa fa-times"></span> Delete <strong>Data</strong> ?</div>
+            <div class="mb-content">
+                <p>Are you sure you want to Delete this row?</p>                    
+                <p>Press Yes if you sure.</p>
+            </div>
+            <div class="mb-footer">
+                <div class="pull-right">
+                    <button class="btn btn-success btn-lg mb-control-yes">Yes</button>
+                    <button class="btn btn-default btn-lg mb-control-close">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>  
+</div> 
+
+   <!-- END DEFAULT DATATABLE -->
+   <div class="modal" id="modal_basic" tabindex="-1" role="dialog" aria-labelledby="defModalHead" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="defModalHead">Edit Subjects</h4>
+            </div>
+        <div class="modal-body">
+                <div class="row">
+                    <div class="panel-body">
+                        <div class="form-group">
+                <div class="col-md-6 col-xs-6">                                                                                                                                                        
+                    <input type="text" class="form-control" placeholder="Employee subject name" id="edit_name">  
+                </div>
+                <br><br><br>
+    
+                    <div class="col-md-6 col-xs-6">                                                                                            
+                        <select  class="form-control" id="edit_status">
+                            <option value="1">Active</option>
+                            <option value="0">Deactive</option>    
+                        </select>
+                    </div><br><br>
+                   SELECT CLASSES:
+                {% for i in class %}
+                {% if i.status == 1 %}
+                    <div>
+                        <label>
+                            <input type="checkbox"  class="icheck" id="check" name="checkitems" value="{{i.id}}"/> <!-- Assuming i.id represents the checkbox value -->
+                            {{i.name}}
+                        </label>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+    </div>      
+    </div>
+    <form>                       
+        <div class="modal-footer">
+             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+             <button class="btn btn-primary pull-right" onclick='update_sub()'>Update</button>
+             <input type="hidden" value="{{ request.scheme }}://{{ request.get_host }}/update_sub/"  id="contacturl">
+             <input type="hidden" id="deptid">
+        </div>
+    </form>
+
+
+<script>
+
+function leo(){
+        document.getElementById('toggleAll').addEventListener('change',function()
+        {
+            var checkbox = document.getElementsByClassName('icheck');
+            for (var i = 0; i < checkbox.length; i++)
+            {
+                checkbox[i].checked=this.checked;
+            }
+        }
+        );
+        
+    }
+
+    function validateForm() {
+        // Check if at least one checkbox is checked
+        if ($('.icheck:checked').length > 0) {
+            // If at least one checkbox is checked, submit the form
+            $('#check').submit();
+        } else {
+            // If no checkbox is checked, display an alert or perform any other action
+            alert('Please select at least one item before submitting.');
+            return false
+        }
+    }
+ </script>
+
+{% endblock %}

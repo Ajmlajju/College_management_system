@@ -1,0 +1,154 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+<ul class="breadcrumb">
+    <li><a href="#">Home</a></li>                    
+    <li class="active">Edit Employee</li>
+</ul>
+<div class="page-title">                    
+  <h1><span></span>Edit Employee</h1>
+</div>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{msg}}
+    <div class="panel panel-default">
+        
+        <div class="panel-heading">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-3 col-xs-3 control-label">Employee Name</label>
+                    <div class="col-md-3 col-xs-3">                                                                                                                                                        
+                        <input type="text" name="e_name" value="{{emp.emp_name}}" class="form-control">                                         
+                    </div>
+                    {{mesg}}    
+                </div><br>
+
+                <div class="form-group">
+                    <label class="col-md-3 col-xs-3 control-label">Date of Birth</label>
+                    <div class="col-md-3 col-xs-3">                                                                                                                                                        
+                        <input type="date" name="dob" value="{{emp.dob|date:'Y-m-d'}}" class="form-control">                                                    
+                    </div>
+                </div><br>
+
+                <div class="form-group">
+                    <label class="col-md-3 col-xs-3 control-label">Mobile Number</label>
+                    <div class="col-md-3 col-xs-3">                                                                                                                                                        
+                        <input type="number" name="mob" value="{{emp.mob}}" class="form-control">                                                    
+                    </div>
+                </div><br>
+
+                <div class="form-group">
+                    <label class="col-md-3 col-xs-3 control-label">Email</label>
+                    <div class="col-md-3 col-xs-3">                                                                                                                                                        
+                        <input type="email" name="email" value="{{emp.email}}" class="form-control">                                                         
+                    </div>
+                    {{msg}}
+                </div><br>
+
+                <div class="form-group">
+                    <label class="col-md-3 col-xs-3 control-label">Gender</label>
+                    <div class="col-md-3 col-xs-3">                                                                                                                                                        
+                        <select class="form-control" value="{{emp.gender}}" name="gender">
+                                    <option value="1"{% if emp.gender == 1 %} selected {% endif %}>Male</option>
+                                    <option value="2"{% if emp.gender == 2 %} selected {% endif %}>Female</option>
+                                    <option value="3"{% if emp.gender == 3 %} selected {% endif %}>others</option>
+                        </select>   
+                    </div> 
+                </div><br>
+
+                <div class="form-group">
+                    <label class="col-md-3 col-xs-3 control-label">Address</label>
+                    <div class="col-md-3 col-xs-3">                                                                                                                                                        
+                        <textarea name="address">{{emp.address}}</textarea>                                                  
+                    </div>
+                </div><br><br>
+
+                <div class="form-group">
+                    <label class="col-md-3 col-xs-3 control-label">Qualification</label>
+                    <div class="col-md-3 col-xs-3">                                                                                                                                                        
+                        <select class="form-control" name="qual">
+                            {% for i in qa %}
+                                <option value="{{i.id}}"{% if emp.qual_id == i.id %}selected{% endif %}>{{i.name}}</option>
+                            {% endfor %}
+                        </select>                                               
+                    </div>
+                </div><br>
+
+                <div class="form-group">
+                    <label class="col-md-3 col-xs-3 control-label">Join date</label>
+                    <div class="col-md-3 col-xs-3">                                                                                                                                                        
+                        <input type="date" name="j_date" value="{{emp.j_date|date:'Y-m-d'}}" class="form-control">                                                
+                    </div>
+                </div><br>
+
+                <div class="form-group">
+                    <label class="col-md-3 col-xs-3 control-label">Photo</label>
+                    <input type="file" name="pic" multiple class="file" data-preview-file-type="any"/>  
+                    <input type="hidden" value="{{emp.photo}}" name="ph">
+                    {% if emp.photo %}
+                            <img src="{{emp.photo.url}}" height="50px" width="50px">
+                        {% else %}
+                            <img src="{% static 'img/no_image.jpg' %}" height="50px" width="50px">
+                        {% endif %}
+                </div><br>
+
+                <div class="form-group">
+                <label class="col-md-3 col-xs-3 control-label">Status</label>
+                <select class="form-control" name="sta">
+                    <option value="1" {% if emp.status == 1 %} selected {% endif %}>ACTIVE</option>
+                    <option value="0" {% if emp.status == 0 %} selected {% endif %}>DEACTIVE</option>
+                  </select>
+                </div><br>
+
+            <!-- <div class="form-group" id="cds">
+                <label class="col-md-2 col-xs-12 page-title"><h3>Class, Division, and Subject</h3></label>
+                <div class="col-md-2 col-xs-4 col-sm-4 col-lg-4">                                                                                                                                                        
+                    <select class="form-control" onchange="subc(this.value)" id="class_select" name="cla">
+                        {% for i in clas %}
+                            {% if i.status == 1 %}
+                                <option value="{{i.id}}">{{i.name}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 col-xs-4 col-sm-4 col-lg-4">
+                    <select class="form-control" id="division_select" name="divi">
+                        {% for i in div %}
+                            {% if i.status == 1 %}
+                                <option value="{{i.id}}">{{i.name}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 col-xs-4 col-sm-4 col-lg-4">
+                    <select class="form-control" id="subject" name="sub">   
+                                                                 
+                    </select>
+                    <br>
+                </div>
+                <center><button type="button" class="btn btn-primary" onclick="addToTable()">ADD</button></center>
+            <!-- Table to display added records -->
+
+        </div>
+    </div>
+</div>    
+
+<!-- 
+<table class="table" id="recordTable">
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Class</th>
+            <th>Division</th>
+            <th>Subject</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        <!-- Table body will be dynamically populated -->
+    <!-- </tbody>
+    </table>    --> 
+    <center> <button class="btn btn-primary">Submit</button> </center>
+</form>
+
+{% endblock %}

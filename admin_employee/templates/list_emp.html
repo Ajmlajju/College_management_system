@@ -1,0 +1,96 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+<!-- START DEFAULT DATATABLE -->
+<div class="panel panel-default">
+    <div class="panel-heading">                                
+        <h3 class="panel-title">List Employees</h3>
+        <ul class="panel-controls">
+            <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span></a></li>
+            <li><a href="#" class="panel-refresh"><span class="fa fa-refresh"></span></a></li>
+            <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+        </ul>                                
+    </div>
+    <div class="panel-body">
+        <table class="table datatable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Employee Name</th>
+                    <th>Photo</th>
+                    <th>Barcode</th>
+                    <th>Mobile</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                   
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in emp %}
+                <tr id="tr{{i.id}}">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ i.emp_name }}</td>
+                    <td>
+                        {% if i.photo %}
+                            <img src="{{i.photo.url}}" height="100px" width="100px">
+                        {% else %}
+                            <img src="{% static 'img/no image.jpg' %}" height="100px" width="100px">
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if i.barcode %}
+                            <img src="{{i.barcode.url}}" height="100px" width="100px">
+                        {% else %}
+                            <img src="{% static 'img/no image.jpg' %}" height="100px" width="100px">
+                        {% endif %}
+                    </td>
+                    <td>{{ i.mob }}</td>
+                    <td>{{ i.dept_id.name }}</td>
+                    {% if i.status == 1 %}
+                    <td><span class="label label-success">Active</span></td>
+                    {% else %}
+                    <td><span class="label label-danger">DeActive</span></td>
+                    {% endif %}
+                    <td>
+                        <a class="btn btn-info btn-sm" href="{% url 'edit_em' id=i.id %}">
+                            <i class="fas fa-pencil-alt"></i> Edit
+                        </a>
+                        <button class="btn btn-default btn-rounded btn-sm" onclick="edit_empl('{{i.id}}')"><span id="spinner{{i.id}}" class="fa fa-pencil"></span></button>
+                        <button class="btn btn-default btn-rounded btn-sm">
+                            <span class="fa fa-eye"></span> View
+                        </button>
+
+                        <button class="btn btn-default btn-rounded btn-sm" onClick="delete_row('{{i.id}}','tr{{i.id}}')">
+                            <span class="fa fa-trash-o"></span>
+                        </button>
+                        <input type="hidden" value="{{request.scheme}}://{{request.get_host}}/dele_emp/" id="delink">
+                        <input type="hidden" id="deptid">
+                        
+                    </td>
+                </tr>
+            {% endfor %}
+            
+            <div class="message-box animated fadeIn" data-sound="alert" id="mb-remove-row">
+                <div class="mb-container">
+                    <div class="mb-middle">
+                        <div class="mb-title"><span class="fa fa-times"></span> Delete <strong>Data</strong> ?</div>
+                        <div class="mb-content">
+                            <p>Are you sure you want to Delete this row?</p>                    
+                            <p>Press Yes if you sure.</p>
+                        </div>
+                        <div class="mb-footer">
+                            <div class="pull-right">
+                                <button class="btn btn-success btn-lg mb-control-yes">Yes</button>
+                                <button class="btn btn-default btn-lg mb-control-close">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </div>
+            </tbody>
+        </table>
+
+<!-- END DEFAULT DATATABLE -->
+{% endblock %}
